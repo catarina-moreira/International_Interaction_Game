@@ -1,0 +1,92 @@
+import random
+
+class Agent:
+
+    def __init__(self, name, id):
+        self.name = name
+        self.id = id
+        self.goal = "survive"
+        self.rules = [
+            "make a demand",
+            "do nothing"
+        ]
+        self.points = 0
+
+        # Initialize the agent's utility
+        self.utility = 0
+
+    def calculate_utility(self, action, other_agent):
+        # Calculate the utility of the action
+        if action == "make a demand":
+            if other_agent.goal == "survive":
+                
+                # If the other agent complies, the agent gets a high utility
+                if random.random() < 0.5:
+                    self.points += 1
+                    return 1.0
+                else:
+                    # If the other agent resists, the agent gets a low utility
+                    self.points +=0
+                    return 0.0
+            else:
+                # If the other agent has a different goal, the agent gets a negative utility
+                self.points += -1
+                return -1.0
+        else:
+            # If the agent does nothing, the utility is zero
+            self.points += 0
+            return 0.0
+
+    def act(self, other_agent):
+        # Choose the action with the highest utility
+        action = self.rules[self.calculate_utility(self.rules[0], other_agent) > self.calculate_utility(self.rules[1], other_agent)]
+
+        # Perform the action
+        if action == "make a demand":
+            print(f"{self.name} made a demand to {other_agent.name}")
+        elif action == "do nothing":
+            print(f"{self.name} did nothing")
+
+        # Update the state of the world
+        if action == "make a demand" and other_agent.goal == "survive":
+            if random.random() < 0.5:
+                # The other agent complies
+                print(f"{other_agent.name} complied with {self.name}'s demand")
+            else:
+                # The other agent resists
+                print(f"{other_agent.name} resisted {self.name}'s demand")
+                # If the other agent resists, there is a chance of war
+                if random.random() < 0.5:
+                    print("There was a war!")
+                else:
+                    print("There was no war.")
+
+        # Check if the goal has been achieved
+        #if self.goal == "survive": # is checking if the agent's goal is to survive. If the agent's goal is to survive, then it checks if the action taken by the agent (making a demand or doing nothing) has resulted in achieving the goal. If the other agent's goal is also to survive and complies with the demand, then the agent has achieved its goal. If the other agent's goal is not to survive, then the agent has not achieved its goal.
+        if self.goal == "survive":
+            if action == "make a demand" and other_agent.goal == "survive":
+                if other_agent.goal == "survive":
+                    print(f"{self.name} achieved their goal.")
+                else:
+                    print(f"{self.name} did not achieve their goal.")
+
+# Create two agents
+agent1 = Agent("Agent 1", 1)
+agent2 = Agent("Agent 2", 2)
+
+# Let the agents interact
+while True:
+    if agent1.points >= 20:
+        print(f"{agent1.name} won!")
+        break
+    
+    if agent2.points >= 10:
+        print(f"{agent2.name} won!")
+        break
+    
+    print("---------------------")
+    agent1.act(agent2)
+    agent2.act(agent1)  
+    print("---------------------")    
+
+    
